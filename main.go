@@ -30,6 +30,13 @@ func main() {
 	pathDev := paths.PathDev
 	pathProd := paths.PathProd
 
+	pathsBaseCert := paths.PathBaseCert
+	pathsBaseConfig := paths.PathBaseConfig
+	pathsBasePvPvc := paths.PathBasePvPvc
+	pathsBaseDatabase := paths.PathBaseDatabase
+	pathsBaseBackend := paths.PathBaseBackend
+	pathsBaseIngress := paths.PathBaseIngress
+
 	//========================================================
 	// Crear archivos de manifiestos dev
 	//=========================================================
@@ -76,6 +83,88 @@ func main() {
 	kustomizationProdSitesPath := pathProd + "/kustomization.yaml"
 	os.WriteFile(kustomizationProdSitesPath, []byte(kustomizationProdSitesContent), 0664)
 	fmt.Printf("Archivo de Kustomization Prod Sites creado en: %s\n", kustomizationProdSitesPath)
+	//========================================================
+	// Crear archivos de manifiestos base
+	//=========================================================
+	// Crear certs
+	certsContent := certs(config.ProjectName, config.DNS)
+	certsPath := pathsBaseCert + "/01-cert.yaml"
+	os.WriteFile(certsPath, []byte(certsContent), 0664)
+	fmt.Printf("Archivo de Certs creado en: %s\n", certsPath)
+	// Crear config
+	configContent := configMap(config.ProjectName)
+	configPath := pathsBaseConfig + "/01-configmap.yaml"
+	os.WriteFile(configPath, []byte(configContent), 0664)
+	fmt.Printf("Archivo de ConfigMap creado en: %s\n", configPath)
+	//Crear secret
+	secretContent := secret(config.ProjectName)
+	secretPath := pathsBaseConfig + "/01-secret.yaml"
+	os.WriteFile(secretPath, []byte(secretContent), 0664)
+	fmt.Printf("Archivo de Secret creado en: %s\n", secretPath)
+	// Crear pv
+	pvContent := pv(config.ProjectName)
+	pvPath := pathsBasePvPvc + "/01-pv.yaml"
+	os.WriteFile(pvPath, []byte(pvContent), 0664)
+	fmt.Printf("Archivo de PV creado en: %s\n", pvPath)
+	// Crear pvc
+	pvcContent := pvc(config.ProjectName)
+	pvcPath := pathsBasePvPvc + "/02-pvc.yaml"
+	os.WriteFile(pvcPath, []byte(pvcContent), 0664)
+	fmt.Printf("Archivo de PVC creado en: %s\n", pvcPath)
+	// Crear headless service de la base de datos
+	databaseHeadlessContent := databaseHeadless(config.ProjectName, config.DBImageName, config.DBPort)
+	databaseHeadlessPath := pathsBaseDatabase + "/01-headless.yaml"
+	os.WriteFile(databaseHeadlessPath, []byte(databaseHeadlessContent), 0664)
+	fmt.Printf("Archivo de Database Headless creado en: %s\n", databaseHeadlessPath)
+	// Cerar service database
+	databaseServiceContent := databaseService(config.ProjectName, config.DBImageName, config.DBPort)
+	databaseServicePath := pathsBaseDatabase + "/01-service.yaml"
+	os.WriteFile(databaseServicePath, []byte(databaseServiceContent), 0664)
+	fmt.Printf("Archivo de Database Server creado en: %s\n", databaseServicePath)
+	// Crear statefulset database
+	databaseStatefulSetContent := databaseStatefulSet(config.ProjectName, config.DBImageName, config.DBTagName, config.DBPort)
+	databaseStatefulSetPath := pathsBaseDatabase + "/02-statefulset.yaml"
+	os.WriteFile(databaseStatefulSetPath, []byte(databaseStatefulSetContent), 0664)
+	fmt.Printf("Archivo de Database StatefulSet creado en: %s\n", databaseStatefulSetPath)
+	// Crear service backend
+	backendServiceContent := developmentService(config.ProjectName, config.APPport)
+	backendServicePath := pathsBaseBackend + "/01-service.yaml"
+	os.WriteFile(backendServicePath, []byte(backendServiceContent), 0664)
+	fmt.Printf("Archivo de Backend creado en: %s\n", backendServicePath)
+	// Crear deployment backend
+	backendDeploymentContent := developmentDeployment(config.ProjectName, config.ImageRepository, config.APPport)
+	backendDeploymentPath := pathsBaseBackend + "/02-deployment.yaml"
+	os.WriteFile(backendDeploymentPath, []byte(backendDeploymentContent), 0664)
+	fmt.Printf("Archivo de Backend Deployment creado en: %s\n", backendDeploymentPath)
+	// Crear ingress
+	ingressContent := ingress(config.ProjectName, config.ImageRepository, config.DNS)
+	ingressPath := pathsBaseIngress + "/01-ingress.yaml"
+	os.WriteFile(ingressPath, []byte(ingressContent), 0664)
+	fmt.Printf("Archivo de Ingress creado en: %s\n", ingressPath)
+	// Crear kustomization Base Project
+	kustomizationBaseProjectContent := kustomizationBaseProject()
+	kustomizationBaseProjectPath := paths.PathBase + "/kustomization.yaml"
+	os.WriteFile(kustomizationBaseProjectPath, []byte(kustomizationBaseProjectContent), 0664)
+	fmt.Printf("Archivo de Kustomization Base Project creado en: %s\n", kustomizationBaseProjectPath)
+
+	//========================================================
+
+	// Crear database
+	// databaseContent := database(config.ProjectName, config.ImageRepository, config.DBImageName)
+	// databasePath := pathsBaseDatabase + "/database.yaml"
+	// os.WriteFile(databasePath, []byte(databaseContent), 0664)
+	// fmt.Printf("Archivo de Database creado en: %s\n", databasePath)
+	// Crear backend
+	// backendContent := backend(config.ProjectName, config.ImageRepository)
+	// backendPath := pathsBaseBackend + "/backend.yaml"
+	// os.WriteFile(backendPath, []byte(backendContent), 0664)
+	// fmt.Printf("Archivo de Backend creado en: %s\n", backendPath)
+	// Crear ingress
+	// ingressContent := ingress(config.ProjectName, config.ImageRepository, config.DNS)
+	// ingressPath := pathsBaseIngress + "/ingress.yaml"
+	// os.WriteFile(ingressPath, []byte(ingressContent), 0664)
+	// fmt.Printf("Archivo de Ingress creado en: %s\n", ingressPath)
+	//========================================================
 	// Finalización
 	fmt.Println("\nFuncionando!")
 }
@@ -84,13 +173,23 @@ func menu() ManifestConfig {
 
 	projectName := leerLinea("1. Escriba el nombre del proyecto")
 	imageRepository := leerLinea("2. Coloque el repositorio de la imagen docker ej: docker.io/empresa-usuario/nombre-imagen")
-	dbImageName := leerLinea("3. Coloque el nombre de la imagen de la base de datos ej: mongo:8, postgres:18")
+	appport := leerLinea("Coloque el puerto de la aplicación ej: 80, 8080, 3000")
+	dbImageName := leerLinea("3. Coloque el nombre de la imagen de la base de datos ej: mongo, postgres, mariadb")
+	dbTagName := leerLinea("4.Coloque el tag de la imagen de la base de datos ej: latest, 6.0, 14-alpine")
+	dbPort := leerLinea("Coloque el puerto de la base de datos ej: 27017, 5432, 3306")
+	dns := leerLinea("5. Coloque el dominio DNS del proyecto ej: miproyecto.misitio.com")
+	volumeHandler := leerLinea("6. Coloque el volume handler ej: ocid1.volume.oc1.sa-santiago-1.xxx")
 	fmt.Println("Iniciando configuración...")
 
 	return ManifestConfig{
 		ProjectName:     projectName,
 		ImageRepository: imageRepository,
 		DBImageName:     dbImageName,
+		DBTagName:       dbTagName,
+		DNS:             dns,
+		volumeHandler:   volumeHandler,
+		DBPort:          dbPort,
+		APPport:         appport,
 	}
 
 }
@@ -157,6 +256,12 @@ func crearEstructurasProyecto(rutas RutasConfig) {
 		rutas.PathDev,
 		rutas.PathProd,
 		rutas.PathBase,
+		rutas.PathBaseCert,
+		rutas.PathBaseConfig,
+		rutas.PathBasePvPvc,
+		rutas.PathBaseDatabase,
+		rutas.PathBaseBackend,
+		rutas.PathBaseIngress,
 		rutas.PathSitesDev,
 		rutas.PathSitesProd,
 	}
@@ -166,10 +271,16 @@ func crearEstructurasProyecto(rutas RutasConfig) {
 }
 func rutasProyecto(projectName string) RutasConfig {
 	return RutasConfig{
-		PathDev:       "./" + projectName + "/dev/sites/" + projectName,
-		PathProd:      "./" + projectName + "/prod/sites/" + projectName,
-		PathBase:      "./" + projectName + "/sitesfoca/base/" + projectName,
-		PathSitesDev:  "./" + projectName + "/sitesfoca/dev/" + projectName,
-		PathSitesProd: "./" + projectName + "/sitesfoca/prod/" + projectName,
+		PathDev:          "./" + projectName + "/dev/sites/" + projectName,
+		PathProd:         "./" + projectName + "/prod/sites/" + projectName,
+		PathBase:         "./" + projectName + "/sitesfoca/base/" + projectName,
+		PathBaseCert:     "./" + projectName + "/sitesfoca/base/" + projectName + "/01-certs",
+		PathBaseConfig:   "./" + projectName + "/sitesfoca/base/" + projectName + "/01-config",
+		PathBasePvPvc:    "./" + projectName + "/sitesfoca/base/" + projectName + "/01-pv-pvc",
+		PathBaseDatabase: "./" + projectName + "/sitesfoca/base/" + projectName + "/02-database",
+		PathBaseBackend:  "./" + projectName + "/sitesfoca/base/" + projectName + "/03-backend",
+		PathBaseIngress:  "./" + projectName + "/sitesfoca/base/" + projectName + "/04-ingress",
+		PathSitesDev:     "./" + projectName + "/sitesfoca/dev/" + projectName,
+		PathSitesProd:    "./" + projectName + "/sitesfoca/prod/" + projectName,
 	}
 }
