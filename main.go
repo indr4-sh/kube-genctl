@@ -11,7 +11,8 @@ func main() {
 	fmt.Println("Generador de manifiestos:")
 	config := menu()
 	fmt.Println(config.ProjectName)
-	crearEstructurasProyecto(config.ProjectName)
+	paths := rutasProyecto(config.ProjectName)
+	crearEstructurasProyecto(paths)
 	// pathDev := "./" + config.ProjectName + "/dev/sites/" + config.ProjectName
 	// pathProd := "./" + config.ProjectName + "/prod/sites/" + config.ProjectName
 	// pathBase := "./" + config.ProjectName + "/sitesfoca/base/" + config.ProjectName
@@ -22,9 +23,12 @@ func main() {
 	// crearCarpetas(pathBase)
 	// crearCarpetas(pathSitesDev)
 	// crearCarpetas(pathSitesProd)
-	pathDev := crearEstructurasProyecto(config.ProjectName)["pathDev"]
-	pathProd := crearEstructurasProyecto(config.ProjectName)["pathProd"]
+	//pathDev := crearEstructurasProyecto(config.ProjectName)["pathDev"]
+	//pathProd := crearEstructurasProyecto(config.ProjectName)["pathProd"]
 	//fmt.Println("Carpetas creadas correctamente." + pathDev)
+
+	pathDev := paths.PathDev
+	pathProd := paths.PathProd
 
 	//========================================================
 	// Crear archivos de manifiestos dev
@@ -114,7 +118,7 @@ func leerLinea(prompt string) string {
 }
 
 func crearCarpetas(ruta string) error {
-	err := os.MkdirAll(ruta, 0755)
+	err := os.MkdirAll(ruta, 0744)
 	if err != nil {
 		fmt.Println("Error al crear la carpeta:", err)
 		return err
@@ -122,7 +126,7 @@ func crearCarpetas(ruta string) error {
 	fmt.Println("Carpeta creada (o ya existía) en:", ruta)
 	return nil
 }
-func crearEstructurasProyecto(projectName string) map[string]string {
+func crearEstructurasProyecto(rutas RutasConfig) {
 	// rutas := []string{
 	// 	"./" + projectName + "/dev/sites/" + projectName,
 	// 	"./" + projectName + "/prod/sites/" + projectName,
@@ -130,22 +134,42 @@ func crearEstructurasProyecto(projectName string) map[string]string {
 	// 	"./" + projectName + "/sitesfoca/dev/" + projectName,
 	// 	"./" + projectName + "/sitesfoca/prod/" + projectName,
 	// }
-	rutas := map[string]string{
-		"pathDev":       "./" + projectName + "/dev/sites/" + projectName,
-		"pathProd":      "./" + projectName + "/prod/sites/" + projectName,
-		"pathBase":      "./" + projectName + "/sitesfoca/base/" + projectName,
-		"pathSitesDev":  "./" + projectName + "/sitesfoca/dev/" + projectName,
-		"pathSitesProd": "./" + projectName + "/sitesfoca/prod/" + projectName,
-	}
+	// rutas := map[string]string{
+	// 	"pathDev":       "./" + projectName + "/dev/sites/" + projectName,
+	// 	"pathProd":      "./" + projectName + "/prod/sites/" + projectName,
+	// 	"pathBase":      "./" + projectName + "/sitesfoca/base/" + projectName,
+	// 	"pathSitesDev":  "./" + projectName + "/sitesfoca/dev/" + projectName,
+	// 	"pathSitesProd": "./" + projectName + "/sitesfoca/prod/" + projectName,
+	// }
 
-	for _, ruta := range rutas {
-		crearCarpetas(ruta)
-		// err := os.MkdirAll(ruta, 0755)
-		// if err != nil {
-		// 	fmt.Println("Error al crear la carpeta:", err)
-		// } else {
-		// 	fmt.Println("Carpeta creada (o ya existía) en:", ruta)
-		// }
+	// for _, ruta := range rutas {
+	// 	crearCarpetas(ruta)
+	// 	// err := os.MkdirAll(ruta, 0755)
+	// 	// if err != nil {
+	// 	// 	fmt.Println("Error al crear la carpeta:", err)
+	// 	// } else {
+	// 	// 	fmt.Println("Carpeta creada (o ya existía) en:", ruta)
+	// 	// }
+	// }
+	//rutas := rutasProyecto(projectName)
+
+	rutasSlice := []string{
+		rutas.PathDev,
+		rutas.PathProd,
+		rutas.PathBase,
+		rutas.PathSitesDev,
+		rutas.PathSitesProd,
 	}
-	return rutas
+	for _, ruta := range rutasSlice {
+		crearCarpetas(ruta)
+	}
+}
+func rutasProyecto(projectName string) RutasConfig {
+	return RutasConfig{
+		PathDev:       "./" + projectName + "/dev/sites/" + projectName,
+		PathProd:      "./" + projectName + "/prod/sites/" + projectName,
+		PathBase:      "./" + projectName + "/sitesfoca/base/" + projectName,
+		PathSitesDev:  "./" + projectName + "/sitesfoca/dev/" + projectName,
+		PathSitesProd: "./" + projectName + "/sitesfoca/prod/" + projectName,
+	}
 }

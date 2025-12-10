@@ -5,3 +5,10 @@ type ManifestConfig struct {
 	ImageRepository string
 	DBImageName     string
 }
+type RutasConfig struct {
+	PathDev       string
+	PathProd      string
+	PathSitesDev  string
+	PathSitesProd string
+	PathBase      string
+}

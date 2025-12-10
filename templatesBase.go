@@ -5,7 +5,7 @@ import (
 	"text/template"
 )
 
-func image2Repository(projectName string, imageRepository string) string {
+func certs(projectName string, imageRepository string) string {
 	data := ManifestConfig{
 		ProjectName:     projectName,
 		ImageRepository: imageRepository,
