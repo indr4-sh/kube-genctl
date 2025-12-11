@@ -36,6 +36,8 @@ func main() {
 	pathsBaseDatabase := paths.PathBaseDatabase
 	pathsBaseBackend := paths.PathBaseBackend
 	pathsBaseIngress := paths.PathBaseIngress
+	pathsSitesDev := paths.PathSitesDev
+	pathsSitesProd := paths.PathSitesProd
 
 	//========================================================
 	// Crear archivos de manifiestos dev
@@ -148,6 +150,21 @@ func main() {
 	fmt.Printf("Archivo de Kustomization Base Project creado en: %s\n", kustomizationBaseProjectPath)
 
 	//========================================================
+	// Crear overlays dev y prod
+	//=========================================================
+	// Crear kustomization Dev Project
+	kustomizationDevProjectContent := kustomizationDevProject(config.ProjectName)
+	kustomizationDevProjectPath := pathsSitesDev + "/kustomization.yaml"
+	os.WriteFile(kustomizationDevProjectPath, []byte(kustomizationDevProjectContent), 0664)
+	fmt.Printf("Archivo de Kustomization Dev Project creado en: %s\n", kustomizationDevProjectPath)
+	// Crear kustomization Prod Project
+	kustomizationProdProjectContent := kustomizationProdProject(config.ProjectName)
+	kustomizationProdProjectPath := pathsSitesProd + "/kustomization.yaml"
+	os.WriteFile(kustomizationProdProjectPath, []byte(kustomizationProdProjectContent), 0664)
+	fmt.Printf("Archivo de Kustomization Prod Project creado en: %s\n", kustomizationProdProjectPath)
+	//========================================================
+	// Crear archivos de manifiestos patch
+	//=========================================================
 
 	// Crear database
 	// databaseContent := database(config.ProjectName, config.ImageRepository, config.DBImageName)
