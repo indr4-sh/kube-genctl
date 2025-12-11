@@ -5,10 +5,12 @@ type ManifestConfig struct {
 	ImageRepository string
 	DBImageName     string
 	DNS             string
-	volumeHandler   string
+	VolumeHandler   string
 	DBTagName       string
 	DBPort          string
 	APPport         string
+	TagNameDev      string
+	TagNameProd     string
 }
 type RutasConfig struct {
 	PathDev          string

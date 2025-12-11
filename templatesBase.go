@@ -318,7 +318,7 @@ metadata:
     app: {{ .ProjectName }}
     tier: backend
     type: service
-  name: {{ .ProjectName }}service
+  name: {{ .ProjectName }}-service
 spec:
   ports:
     - port: {{ .APPport }}
@@ -411,10 +411,10 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host({{ .DNS }}) # <-- Colocar backticks
+    - match: Host("{{ .DNS }}") # <-- Colocar backticks
       kind: Rule 
       services:
-        - name: {{ .ProjectName }}service
+        - name: {{ .ProjectName }}-service
           port: {{ .APPport }}
       middlewares:
         - name: redirect-https
@@ -427,7 +427,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host({{ .DNS }}) # <-- Colocar backticks
+  - match: Host("{{ .DNS }}") # <-- Colocar backticks
     kind: Rule
     services:
     - name: {{ .ProjectName }}-service

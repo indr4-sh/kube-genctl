@@ -139,7 +139,7 @@ func main() {
 	os.WriteFile(backendDeploymentPath, []byte(backendDeploymentContent), 0664)
 	fmt.Printf("Archivo de Backend Deployment creado en: %s\n", backendDeploymentPath)
 	// Crear ingress
-	ingressContent := ingress(config.ProjectName, config.ImageRepository, config.DNS)
+	ingressContent := ingress(config.ProjectName, config.DNS, config.APPport)
 	ingressPath := pathsBaseIngress + "/01-ingress.yaml"
 	os.WriteFile(ingressPath, []byte(ingressContent), 0664)
 	fmt.Printf("Archivo de Ingress creado en: %s\n", ingressPath)
@@ -166,22 +166,67 @@ func main() {
 	// Crear archivos de manifiestos patch
 	//=========================================================
 
-	// Crear database
-	// databaseContent := database(config.ProjectName, config.ImageRepository, config.DBImageName)
-	// databasePath := pathsBaseDatabase + "/database.yaml"
-	// os.WriteFile(databasePath, []byte(databaseContent), 0664)
-	// fmt.Printf("Archivo de Database creado en: %s\n", databasePath)
-	// Crear backend
-	// backendContent := backend(config.ProjectName, config.ImageRepository)
-	// backendPath := pathsBaseBackend + "/backend.yaml"
-	// os.WriteFile(backendPath, []byte(backendContent), 0664)
-	// fmt.Printf("Archivo de Backend creado en: %s\n", backendPath)
-	// Crear ingress
-	// ingressContent := ingress(config.ProjectName, config.ImageRepository, config.DNS)
-	// ingressPath := pathsBaseIngress + "/ingress.yaml"
-	// os.WriteFile(ingressPath, []byte(ingressContent), 0664)
-	// fmt.Printf("Archivo de Ingress creado en: %s\n", ingressPath)
-	//========================================================
+	// Crear cert dev
+	patchCertDevContent := patchCertDev(config.ProjectName, config.DNS)
+	patchCertDevPath := pathsSitesDev + "/01-patch-certs-dev.yaml"
+	os.WriteFile(patchCertDevPath, []byte(patchCertDevContent), 0664)
+	fmt.Printf("Archivo de Patch Cert Dev creado en: %s\n", patchCertDevPath)
+	// Crear cert prod
+	patchCertProdContent := patchCertProd(config.ProjectName, config.DNS)
+	patchCertProdPath := pathsSitesProd + "/01-patch-certs-prod.yaml"
+	os.WriteFile(patchCertProdPath, []byte(patchCertProdContent), 0664)
+	fmt.Printf("Archivo de Patch Cert Prod creado en: %s\n", patchCertProdPath)
+	// Crear configmap dev
+	patchConfigMapDevContent := patchConfigMapDev(config.ProjectName)
+	patchConfigMapDevPath := pathsSitesDev + "/01-patch-configmap-dev.yaml"
+	os.WriteFile(patchConfigMapDevPath, []byte(patchConfigMapDevContent), 0664)
+	fmt.Printf("Archivo de Patch ConfigMap Dev creado en: %s\n", patchConfigMapDevPath)
+	// Crear configmap prod
+	patchConfigMapProdContent := patchConfigMapProd(config.ProjectName)
+	patchConfigMapProdPath := pathsSitesProd + "/01-patch-configmap-prod.yaml"
+	os.WriteFile(patchConfigMapProdPath, []byte(patchConfigMapProdContent), 0664)
+	fmt.Printf("Archivo de Patch ConfigMap Prod creado en: %s\n", patchConfigMapProdPath)
+	// Crear secret dev
+	patchSecretDevContent := patchSecretDev(config.ProjectName)
+	patchSecretDevPath := pathsSitesDev + "/01-patch-secret-dev.yaml"
+	os.WriteFile(patchSecretDevPath, []byte(patchSecretDevContent), 0664)
+	fmt.Printf("Archivo de Patch Secret Dev creado en: %s\n", patchSecretDevPath)
+	// Crear secret prod
+	patchSecretProdContent := patchSecretProd(config.ProjectName)
+	patchSecretProdPath := pathsSitesProd + "/01-patch-secret-prod.yaml"
+	os.WriteFile(patchSecretProdPath, []byte(patchSecretProdContent), 0664)
+	fmt.Printf("Archivo de Patch Secret Prod creado en: %s\n", patchSecretProdPath)
+	// Crear database dev
+	patchDatabaseDevContent := patchDatabaseDev(config.ProjectName, config.VolumeHandler)
+	patchDatabaseDevPath := pathsSitesDev + "/02-patch-database-dev.yaml"
+	os.WriteFile(patchDatabaseDevPath, []byte(patchDatabaseDevContent), 0664)
+	fmt.Printf("Archivo de Patch Database Dev creado en: %s\n", patchDatabaseDevPath)
+	// Crear database prod
+	patchDatabaseProdContent := patchDatabaseProd(config.ProjectName, config.VolumeHandler)
+	patchDatabaseProdPath := pathsSitesProd + "/02-patch-database-prod.yaml"
+	os.WriteFile(patchDatabaseProdPath, []byte(patchDatabaseProdContent), 0664)
+	fmt.Printf("Archivo de Patch Database Prod creado en: %s\n", patchDatabaseProdPath)
+	// Crear backend dev
+	patchBackendDevContent := patchBackendDev(config.ProjectName, config.ImageRepository, config.TagNameDev)
+	patchBackendDevPath := pathsSitesDev + "/03-patch-backend-dev.yaml"
+	os.WriteFile(patchBackendDevPath, []byte(patchBackendDevContent), 0664)
+	fmt.Printf("Archivo de Patch Backend Dev creado en: %s\n", patchBackendDevPath)
+	// Crear backend prod
+	patchBackendProdContent := patchBackendProd(config.ProjectName, config.ImageRepository, config.TagNameProd)
+	patchBackendProdPath := pathsSitesProd + "/03-patch-backend-prod.yaml"
+	os.WriteFile(patchBackendProdPath, []byte(patchBackendProdContent), 0664)
+	fmt.Printf("Archivo de Patch Backend Prod creado en: %s\n", patchBackendProdPath)
+
+	// Crear ingress dev
+	patchIngressDevContent := patchIngressDev(config.ProjectName, config.DNS, config.APPport)
+	patchIngressDevPath := pathsSitesDev + "/04-patch-ingress-dev.yaml"
+	os.WriteFile(patchIngressDevPath, []byte(patchIngressDevContent), 0664)
+	fmt.Printf("Archivo de Patch Ingress Dev creado en: %s\n", patchIngressDevPath)
+	// Crear ingress prod
+	patchIngressProdContent := patchIngressProd(config.ProjectName, config.DNS, config.APPport)
+	patchIngressProdPath := pathsSitesProd + "/04-patch-ingress-prod.yaml"
+	os.WriteFile(patchIngressProdPath, []byte(patchIngressProdContent), 0664)
+	fmt.Printf("Archivo de Patch Ingress Prod creado en: %s\n", patchIngressProdPath)
 	// Finalización
 	fmt.Println("\nFuncionando!")
 }
@@ -190,12 +235,14 @@ func menu() ManifestConfig {
 
 	projectName := leerLinea("1. Escriba el nombre del proyecto")
 	imageRepository := leerLinea("2. Coloque el repositorio de la imagen docker ej: docker.io/empresa-usuario/nombre-imagen")
-	appport := leerLinea("Coloque el puerto de la aplicación ej: 80, 8080, 3000")
-	dbImageName := leerLinea("3. Coloque el nombre de la imagen de la base de datos ej: mongo, postgres, mariadb")
-	dbTagName := leerLinea("4.Coloque el tag de la imagen de la base de datos ej: latest, 6.0, 14-alpine")
-	dbPort := leerLinea("Coloque el puerto de la base de datos ej: 27017, 5432, 3306")
-	dns := leerLinea("5. Coloque el dominio DNS del proyecto ej: miproyecto.misitio.com")
-	volumeHandler := leerLinea("6. Coloque el volume handler ej: ocid1.volume.oc1.sa-santiago-1.xxx")
+	tagNameDev := leerLinea("3. Coloque el tag de la imagen docker ej: dev415, develop-2323")
+	tagNameProd := leerLinea("4. Coloque el tag de la imagen docker ej: prod415, master-2323")
+	appport := leerLinea("5. Coloque el puerto de la aplicación ej: 80, 8080, 3000")
+	dbImageName := leerLinea("6. Coloque el nombre de la imagen de la base de datos ej: mongo, postgres, mariadb")
+	dbTagName := leerLinea("7. Coloque el tag de la imagen de la base de datos ej: latest, 6.0, 14-alpine")
+	dbPort := leerLinea("8. Coloque el puerto de la base de datos ej: 27017, 5432, 3306")
+	dns := leerLinea("9. Coloque el dominio DNS del proyecto ej: miproyecto.misitio.com")
+	volumeHandler := leerLinea("10. Coloque el volume handler ej: ocid1.volume.oc1.sa-santiago-1.xxx")
 	fmt.Println("Iniciando configuración...")
 
 	return ManifestConfig{
@@ -204,9 +251,11 @@ func menu() ManifestConfig {
 		DBImageName:     dbImageName,
 		DBTagName:       dbTagName,
 		DNS:             dns,
-		volumeHandler:   volumeHandler,
+		VolumeHandler:   volumeHandler,
 		DBPort:          dbPort,
 		APPport:         appport,
+		TagNameDev:      tagNameDev,
+		TagNameProd:     tagNameProd,
 	}
 
 }
