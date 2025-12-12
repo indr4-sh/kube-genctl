@@ -274,10 +274,10 @@ spec:
         - name: {{ .DBImageName }}
           image: docker.io/library/{{ .DBImageName }}:{{ .DBTagName }}
           envFrom:
-		  - configMapRef:
-		      name: {{ .ProjectName }}-configmap
-		  - secretRef:
-		      name: {{ .ProjectName }}-secret
+		        - configMapRef:
+		            name: {{ .ProjectName }}-configmap
+		        - secretRef:
+		            name: {{ .ProjectName }}-secret
           ports:
             - containerPort: {{ .DBPort }}
               name: {{ .DBImageName }}
@@ -288,9 +288,6 @@ spec:
         - name: db-{{ .DBImageName }}-{{ .ProjectName }}
           persistentVolumeClaim:
             claimName: {{ .ProjectName }}-pvc
-
-
-
 `
 
 	t, err := template.New("databaseStatefulSet").Parse(tmpl)
