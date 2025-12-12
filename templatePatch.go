@@ -210,7 +210,7 @@ func patchSecretDev(projectName string) string {
 	tmpl := `apiVersion: v1
 kind: Secret
 metadata:
-  name: acuptos-appypf-secret
+  name: {{ .ProjectName }}-secret
 type: Opaque
 stringData:
   SECRET_LOCAL: "XXX" # <-- Colocar secret correspondiente
