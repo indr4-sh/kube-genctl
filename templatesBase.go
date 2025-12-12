@@ -44,7 +44,7 @@ func configMap(projectName string) string {
 	tmpl := `apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .ProjectName }}-config
+  name: {{ .ProjectName }}-configmap
 data:
   APP_ENV: "development"
 `
