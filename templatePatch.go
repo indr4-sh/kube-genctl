@@ -16,7 +16,18 @@ kind: Kustomization
 namespace: sites-foca-dev
 
 resources:
-  - ../../base/{{ .ProjectName }}/
+#  - ../../base/{{ .ProjectName }}/
+#  - ../../base/{{ .ProjectName }}/01-certs/01-cert.yaml
+  - ../../base/{{ .ProjectName }}/01-config/01-configmap.yaml
+  - ../../base/{{ .ProjectName }}/01-config/01-secret.yaml
+  - ../../base/{{ .ProjectName }}/01-pv-pvc/01-pv.yaml
+  - ../../base/{{ .ProjectName }}/01-pv-pvc/02-pvc.yaml
+  - ../../base/{{ .ProjectName }}/02-database/01-headless.yaml
+  - ../../base/{{ .ProjectName }}/02-database/01-service.yaml
+  - ../../base/{{ .ProjectName }}/02-database/02-statefulset.yaml
+  - ../../base/{{ .ProjectName }}/03-backend/01-service.yaml
+  - ../../base/{{ .ProjectName }}/03-backend/02-deployment.yaml
+#  - ../../base/{{ .ProjectName }}/04-ingress/01-ingress.yaml
 
 labels:
   - pairs:

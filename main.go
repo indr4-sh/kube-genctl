@@ -144,10 +144,10 @@ func main() {
 	os.WriteFile(ingressPath, []byte(ingressContent), 0664)
 	fmt.Printf("Archivo de Ingress creado en: %s\n", ingressPath)
 	// Crear kustomization Base Project
-	kustomizationBaseProjectContent := kustomizationBaseProject()
-	kustomizationBaseProjectPath := paths.PathBase + "/kustomization.yaml"
-	os.WriteFile(kustomizationBaseProjectPath, []byte(kustomizationBaseProjectContent), 0664)
-	fmt.Printf("Archivo de Kustomization Base Project creado en: %s\n", kustomizationBaseProjectPath)
+	//kustomizationBaseProjectContent := kustomizationBaseProject()
+	//kustomizationBaseProjectPath := paths.PathBase + "/kustomization.yaml"
+	//os.WriteFile(kustomizationBaseProjectPath, []byte(kustomizationBaseProjectContent), 0664)
+	//fmt.Printf("Archivo de Kustomization Base Project creado en: %s\n", kustomizationBaseProjectPath)
 
 	//========================================================
 	// Crear overlays dev y prod

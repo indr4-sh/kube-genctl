@@ -274,10 +274,10 @@ spec:
         - name: {{ .DBImageName }}
           image: docker.io/library/{{ .DBImageName }}:{{ .DBTagName }}
           envFrom:
-		        - configMapRef:
-		            name: {{ .ProjectName }}-configmap
-		        - secretRef:
-		            name: {{ .ProjectName }}-secret
+            - configMapRef:
+                name: {{ .ProjectName }}-configmap
+            - secretRef:
+                name: {{ .ProjectName }}-secret
           ports:
             - containerPort: {{ .DBPort }}
               name: {{ .DBImageName }}
@@ -408,7 +408,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host("{{ .DNS }}") # <-- Colocar backticks
+    - match: Host("{{ .DNS }}") 
       kind: Rule 
       services:
         - name: {{ .ProjectName }}-service
@@ -424,7 +424,7 @@ spec:
   entryPoints:
     - websecure
   routes:
-  - match: Host("{{ .DNS }}") # <-- Colocar backticks
+  - match: Host("{{ .DNS }}")
     kind: Rule
     services:
     - name: {{ .ProjectName }}-service
